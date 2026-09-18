@@ -1,46 +1,45 @@
-const express = require("express");
-const cors = require("cors");
+const express = require('express');
+const cors = require('cors');
+const axios = require('axios');
+const csv = require('csv-parser');
+const { Readable } = require('stream');
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
-const PORT = 3000;
+// PEGA AQUÍ EL ENLACE CSV QUE COPIASTE DE GOOGLE SHEETS
+const GOOGLE_SHEETS_CSV_URL = "TU_ENLACE_CSV_AQUI";
 
-app.get("/", (req, res) => {
-  res.json({
-    mensaje: "Mi primer servicio Cloud",
-    estado: "Online",
-    tecnologia: "Node.js + Express"
-  });
-});
+app.get('/api/productos', async (req, res) => {
+  try {
+    const response = await axios.get(GOOGLE_SHEETS_CSV_URL);
+    const productos = [];
+    const stream = Readable.from(response.data);
 
-app.get("/api/productos", (req, res) => {
-  const productos = [
-    {
-      id: 1,
-      nombre: "Laptop",
-      precio: 15000,
-      categoria: "Computadoras"
-    },
-    {
-      id: 2,
-      nombre: "Mouse",
-      precio: 350,
-      categoria: "Accesorios"
-    },
-    {
-      id: 3,
-      nombre: "Teclado",
-      precio: 700,
-      categoria: "Accesorios"
-    }
-  ];
-
-  res.json(productos);
+    stream
+      .pipe(csv())
+      .on('data', (row) => {
+        productos.push({
+          id: Number(row.id) || row.id,
+          nombre: row.nombre,
+          precio: Number(row.precio) || 0,
+          categoria: row.categoria
+        });
+      })
+      .on('end', () => {
+        res.json(productos);
+      })
+      .on('error', (err) => {
+        res.status(500).json({ error: 'Error al procesar la hoja de cálculo' });
+      });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al conectar con Google Sheets' });
+  }
 });
 
 app.listen(PORT, () => {
-  console.log("Servidor ejecutandose en puerto " + PORT);
+  console.log(`Servidor activo en el puerto ${PORT}`);
 });
