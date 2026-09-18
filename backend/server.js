@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 // PEGA AQUÍ EL ENLACE CSV QUE COPIASTE DE GOOGLE SHEETS
-const GOOGLE_SHEETS_CSV_URL = "TU_ENLACE_CSV_AQUI";
+const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQDlHD2bqsl6d2H4sTvTsTk5iVmU1eMUh5Twmnbn83y_HetEtwiA16dJ-bhd1B_o74M17Na16GGF4H8/pub?output=csv";
 
 app.get('/api/productos', async (req, res) => {
   try {
