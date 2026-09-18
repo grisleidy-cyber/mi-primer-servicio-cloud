@@ -6,7 +6,7 @@ function App() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/productos")
+    fetch("https://mi-primer-servicio-cloud-7q3r.onrender.com/api/productos")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Error en el servidor");
